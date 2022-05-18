@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 
 from django.views import View
-from .models import Category, Topic
-from .forms import TopicForm
+from .models import Category, Topic, Reply
+from .forms import TopicForm, ReplyForm
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -30,3 +30,32 @@ class IndexView(View):
         return redirect("bbs:index")
 
 index = IndexView.as_view()
+
+
+class ReplyView(View):
+    def get(self, request, pk, *args, **kwargs):
+
+        context = []
+        context["topic"] = Topic.objects.filter(id=pk).first()
+        context["replies"] = Reply.objects.filter(target=pk)
+
+        return render(request, "bbs/reply.html", context)
+
+    def post(self, request, pk, *args, **kwargs):
+        
+        #request.POSTのコピーオブジェクトを作る。(そのままでは書き換えはできないため)
+        copied = request.POST.copy()
+        copied["target"] = pk
+
+        form = ReplyForm(copied)
+
+        if form.is_valid():
+            form.save()
+        else:
+             print("バリデーションNG")
+        
+        return redirect("bbs:reply", pk)
+
+reply = ReplyView.as_view()
+
+

@@ -11,14 +11,11 @@
     <main class="container">
         <form method="POST">
             {% csrf_token %}
-
-            {# ここでカテゴリの選択肢をレンダリングさせる #}
             <select name="category">
                 {% for category in categories %}
                 <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
             </select>
-
             <textarea class="form-control" name="comment"></textarea>
             <input type="submit" value="送信">
         </form>
@@ -27,6 +24,9 @@
         <div class="border">
             <div>{{ topic.category.name }}</div>
             <div>{{ topic.comment }}</div>
+
+            <!--↓追加-->
+            <a class="btn btn-primary" href="{% url 'bbs:reply' topic.id %}">返信</a>
         </div>
         {% endfor %}
 
